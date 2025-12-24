@@ -1,0 +1,18 @@
+# Общие
+.DS_Store
+.idea
+.vscode
+
+# Scala / SBT
+backend/target/
+backend/.bsp/
+backend/.metals/
+
+# Flutter
+frontend/build/
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+
+# Env
+.env
