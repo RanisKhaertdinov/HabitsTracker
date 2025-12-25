@@ -251,7 +251,7 @@ backend/
 
 ### 📊 Статистика
 
-#### GET /stats/{habitId}
+#### GET /habit/{habitId}/stats
 
 ```json
 {
