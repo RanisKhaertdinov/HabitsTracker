@@ -1,6 +1,8 @@
 package com.habittracker
 
-@main
-def main(): Unit =
-  println("Hello world!")
 
+object Main {
+  def main(args: Array[String]): Unit = {
+
+  }
+}
