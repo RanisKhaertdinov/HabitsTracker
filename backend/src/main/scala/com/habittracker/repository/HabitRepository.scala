@@ -14,7 +14,7 @@ object HabitRepository {
 
   def create(habit: Habit): IO[Int] = {
     sql"""
-         INSERT into habits (id, user_id, title, description, schedule_type, active, start_date, created_at)
+         INSERT INTO habits (id, user_id, title, description, schedule_type, active, start_date, created_at)
          VALUES (${habit.id},${habit.userId},${habit.title},${habit.description},${habit.scheduleType},${habit.active},${habit.startDate},${habit.createdAt})
        """.update.run.transact(xa)
   }
