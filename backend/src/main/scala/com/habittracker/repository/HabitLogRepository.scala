@@ -6,6 +6,7 @@ import com.habittracker.util.DbTransactor
 import doobie.Transactor
 import doobie._
 import doobie.implicits._
+import doobie.postgres.implicits._
 
 import java.time.LocalDate
 import java.util.UUID

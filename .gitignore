@@ -6,7 +6,6 @@
 # Scala / SBT
 backend/target/
 backend/.bsp/
-backend/.metals/
 
 # Flutter
 frontend/build/
@@ -16,3 +15,4 @@ frontend/.flutter-plugins-dependencies
 
 # Env
 .env
+

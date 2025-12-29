@@ -35,6 +35,9 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql"     % "42.6.0",
 
   "com.pauldijou" %% "jwt-core" % JwtVersion,
-  "org.mindrot" % "jbcrypt" % "0.4"
+  "com.github.jwt-scala" %% "jwt-circe" % "10.0.1",
+  "org.mindrot" % "jbcrypt" % "0.4",
+
+  "org.scalatest" %% "scalatest" % "3.2.18" % Test
 )
 

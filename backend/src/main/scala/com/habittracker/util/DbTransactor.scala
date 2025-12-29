@@ -1,13 +1,14 @@
 package com.habittracker.util
 
 import cats.effect.IO
+import com.habittracker.config.AppConfig
 import doobie.Transactor
 
 object DbTransactor {
   val transactor: Transactor[IO] = Transactor.fromDriverManager[IO] (
     driver = "org.postgresql.Driver",
-    url = "jdbc:postgresql://localhost:5432/mydb",
-    user = "myuser",
-    pass = "mypassword"
+    url = AppConfig.dbUrl,
+    user = AppConfig.dbUser,
+    pass = AppConfig.dbPassword
   )
 }
