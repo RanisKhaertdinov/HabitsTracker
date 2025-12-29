@@ -237,22 +237,23 @@ backend/
 }
 ```
 
+#### POST /auth/refresh
 ```json
-POST /auth/refresh
 {
   "refresh_token": "eyJ..."
 }
+```
 
-**Ответ:**
-
+#### **Ответ:**
+```json
 {
   "access_token": "new_eyJ...",
   "expires_in": 900
 }
 ```
 
+#### POST /auth/logout
 ```json
-POST /auth/logout
 {
   "refresh_token": "eyJ..."
 }
