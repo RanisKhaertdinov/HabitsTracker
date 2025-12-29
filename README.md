@@ -189,9 +189,27 @@ backend/
 ```json
 {
   "email": "test@mail.com",
-  "password": "123456"
+  "password": "123456",
+  "name": "name"
 }
 ```
+**Ответ:**
+
+```json
+{
+  "tokens": {
+    "access_token": "eyJ...",
+    "refresh_token": "eyJ...",
+    "expires_in": 900, // в секундах, можно другое,
+  },
+  "user": {
+    "id": 1, 
+    "email": "user@example.com", 
+    "name": "name"
+  }
+}
+```
+
 
 #### POST /auth/login
 
@@ -206,10 +224,39 @@ backend/
 
 ```json
 {
-  "token": "jwt-token"
+  "tokens": {
+    "access_token": "eyJ...",
+    "refresh_token": "eyJ...",
+    "expires_in": 900, // в секундах, можно другое,
+  },
+  "user": {
+    "id": 1, 
+    "email": "user@example.com", 
+    "name": "name"
+  }
 }
 ```
 
+```json
+POST /auth/refresh
+{
+  "refresh_token": "eyJ..."
+}
+
+**Ответ:**
+
+{
+  "access_token": "new_eyJ...",
+  "expires_in": 900
+}
+```
+
+```json
+POST /auth/logout
+{
+  "refresh_token": "eyJ..."
+}
+```
 ---
 
 ### 📋 Привычки
