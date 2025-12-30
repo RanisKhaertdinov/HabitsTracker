@@ -258,6 +258,16 @@ backend/
   "refresh_token": "eyJ..."
 }
 ```
+#### GET /auth/me
+
+#### **Ответ:**
+```json
+{
+  "id": 1, 
+  "email": "user@example.com", 
+  "name": "name" 
+}
+```
 ---
 
 ### 📋 Привычки
