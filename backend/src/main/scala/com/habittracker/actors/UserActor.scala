@@ -1,0 +1,122 @@
+package com.habittracker.actors
+
+import cats.effect.unsafe.implicits.global
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior}
+import com.habittracker.domain.User
+import com.habittracker.repository.{RefreshTokenRepository, UserRepository}
+import com.habittracker.security.JwtService
+import com.habittracker.security.PasswordHasher.{hashPassword, verifyPassword}
+
+import java.time.Instant
+import java.util.UUID
+
+object UserActor {
+  sealed trait Command
+
+  final case class Register(
+                           email: String,
+                           password: String,
+                           name: String,
+                           replyTo: ActorRef[Response]
+                           ) extends Command
+
+  final case class Login(
+                             email: String,
+                             password: String,
+                             replyTo: ActorRef[Response]
+                           ) extends Command
+
+  sealed trait Response
+
+  final case class Tokens(
+                         accessToken: String,
+                         refreshToken: String,
+                         expiresIn: Int
+                         )
+  final case class UserDto(
+                          id: UUID,
+                          email: String,
+                          name: String
+                          )
+
+  final case class AuthSuccess(
+                             token: Tokens,
+                             user: UserDto
+                           ) extends Response
+
+  final case class AuthFailed(
+                             reason: String
+                           ) extends Response
+
+  def apply(): Behavior[Command] =
+    Behaviors.receive { (context, message) =>
+      message match {
+        case Register(email, password, name, replyTo) => {
+          UserRepository.findByEmail(email).unsafeRunSync() match {
+            case Some(_) => {
+              replyTo ! AuthFailed("User already exists")
+              Behaviors.same
+            }
+
+            case None => {
+              val userId = UUID.randomUUID()
+              val hashedPassword = hashPassword(password)
+
+              val user = User(
+                id = userId,
+                email = email,
+                name = name,
+                passwordHash = hashedPassword,
+                createdAt = Instant.now()
+              )
+              UserRepository.create(user).unsafeRunSync()
+
+              val userDto = UserDto(
+                id = user.id, email = user.email, name = user.name
+              )
+
+              val refreshToken = JwtService.createRefreshToken(userId)
+              RefreshTokenRepository.create(refreshToken).unsafeRunSync()
+
+              val tokens = Tokens(
+                accessToken = JwtService.createAccessToken(userId, email),
+                refreshToken = refreshToken.token,
+                expiresIn = 900
+              )
+              replyTo ! AuthSuccess(tokens, userDto)
+              Behaviors.same
+            }
+          }
+        }
+        case Login(email, password, replyTo) => {
+          UserRepository.findByEmail(email).unsafeRunSync() match {
+            case None => {
+              replyTo ! AuthFailed("Authentication failed")
+              Behaviors.same
+            }
+            case Some(user) => {
+              if (!verifyPassword(password, user.passwordHash)) {
+                replyTo ! AuthFailed("Wrong password")
+              } else {
+                val userDto = UserDto(
+                  id = user.id, email = user.email, name = user.name
+                )
+                val refreshToken = JwtService.createRefreshToken(user.id)
+                RefreshTokenRepository.create(refreshToken).unsafeRunSync()
+
+                val tokens = Tokens(
+                  accessToken = JwtService.createAccessToken(user.id, email),
+                  refreshToken = refreshToken.token,
+                  expiresIn = 900
+                )
+                replyTo ! AuthSuccess(tokens, userDto)
+              }
+              Behaviors.same
+            }
+          }
+        }
+      }
+    }
+
+}
