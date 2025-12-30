@@ -13,6 +13,12 @@ case class AuthUser (
                     email: String,
                     role: String
                     )
+final case class RefreshToken(
+                               token: String,
+                               userId: UUID,
+                               expiresAt: Instant,
+                               createdAt: Instant
+                             )
 
 object JwtService {
   val jwtSecret = sys.env.getOrElse("JWT_SECRET", throw new IllegalStateException("JWT_SECRET not set"))
@@ -25,7 +31,7 @@ object JwtService {
     )
   }
 
-  def createToken(userId: UUID, email:String) = {
+  def createAccessToken(userId: UUID, email:String) = {
     val claims: JwtClaim = JwtClaim(
       content = Map(
         "userId" -> userId.toString,
@@ -40,6 +46,17 @@ object JwtService {
     )
 
     Jwt.encode(claims, jwtSecret, JwtAlgorithm.HS256)
+  }
+
+  private val RefreshTokenInSeconds = 60 * 60 * 24 * 10
+
+  def createRefreshToken(userId: UUID) = {
+    RefreshToken(
+      token = UUID.randomUUID().toString,
+      userId = userId,
+      expiresAt = Instant.now().plusSeconds(RefreshTokenInSeconds),
+      createdAt = Instant.now()
+    )
   }
 
   def validateToken(token:String): Either[String, AuthUser] = {

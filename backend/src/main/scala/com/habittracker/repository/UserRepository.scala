@@ -15,14 +15,14 @@ object UserRepository {
 
   def create(user: User):IO[Int] = {
     sql"""
-         INSERT INTO users (id, email, password_hash, created_at)
-         VALUES (${user.id}, ${user.email}, ${user.passwordHash}, ${user.createdAt})
+         INSERT INTO users (id, email, name, password_hash, created_at)
+         VALUES (${user.id}, ${user.email}, ${user.name}, ${user.passwordHash}, ${user.createdAt})
          """.update.run.transact(xa)
   }
 
   def findByEmail(email: String): IO[Option[User]] = {
     sql"""
-         SELECT id, email, password_hash, created_at
+         SELECT id, email, name, password_hash, created_at
          FROM users
          WHERE email = $email
        """.query[User].option.transact(xa)
@@ -30,7 +30,7 @@ object UserRepository {
 
   def findById(id: UUID): IO[Option[User]] = {
     sql"""
-         SELECT id, email, password_hash, created_at
+         SELECT id, email, name, password_hash, created_at
          FROM users
          WHERE id = $id
        """.query[User].option.transact(xa)
