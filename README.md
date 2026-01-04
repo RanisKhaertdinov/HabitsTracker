@@ -198,9 +198,9 @@ backend/
 ```json
 {
   "tokens": {
-    "access_token": "eyJ...",
-    "refresh_token": "eyJ...",
-    "expires_in": 900, // в секундах, можно другое,
+    "accessToken": "eyJ...",
+    "refreshToken": "eyJ...",
+    "expiresIn": 900, // в секундах, можно другое,
   },
   "user": {
     "id": 1, 
@@ -225,9 +225,9 @@ backend/
 ```json
 {
   "tokens": {
-    "access_token": "eyJ...",
-    "refresh_token": "eyJ...",
-    "expires_in": 900, // в секундах, можно другое,
+    "accessToken": "eyJ...",
+    "refreshToken": "eyJ...",
+    "expiresIn": 900, // в секундах, можно другое,
   },
   "user": {
     "id": 1, 
@@ -240,22 +240,22 @@ backend/
 #### POST /auth/refresh
 ```json
 {
-  "refresh_token": "eyJ..."
+  "refreshToken": "eyJ..."
 }
 ```
 
 #### **Ответ:**
 ```json
 {
-  "access_token": "new_eyJ...",
-  "expires_in": 900
+  "accessToken": "new_eyJ...",
+  "expiresIn": 900
 }
 ```
 
 #### POST /auth/logout
 ```json
 {
-  "refresh_token": "eyJ..."
+  "refreshToken": "eyJ..."
 }
 ```
 #### GET /auth/me
@@ -328,28 +328,28 @@ backend/
 ```
 id                UUID PRIMARY KEY
 email             VARCHAR UNIQUE
-password_hash     VARCHAR
-created_at        TIMESTAMP
+passwordHash     VARCHAR
+createdAt        TIMESTAMPZ
 ```
 
 ### habits
 
 ```
 id                UUID PRIMARY KEY
-user_id           UUID REFERENCES users(id)
+userId           UUID REFERENCES users(id)
 title             VARCHAR
 description       TEXT
-schedule_type     VARCHAR
+scheduleType     VARCHAR
 active            BOOLEAN
-start_date        DATE
-created_at        TIMESTAMP
+startDate        DATE
+createdAt        TIMESTAMPZ
 ```
 
 ### habit_logs
 
 ```
 id                UUID PRIMARY KEY
-habit_id          UUID REFERENCES habits(id)
+habitId          UUID REFERENCES habits(id)
 date              DATE
 completed         BOOLEAN
 ```
