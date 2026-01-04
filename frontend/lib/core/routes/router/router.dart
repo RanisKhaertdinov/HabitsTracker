@@ -1,11 +1,19 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:frontend/core/router/router.gr.dart';
+import 'package:frontend/core/routes/guard/auth_guard.dart';
+import 'package:frontend/core/routes/router/router.gr.dart';
+import 'package:frontend/features/auth/auth_controller.dart';
 
 @AutoRouterConfig()
 class AppRouter extends RootStackRouter {
+  final AuthController _authController;
+
+  AppRouter(this._authController);
   @override
   List<AutoRoute> get routes => [
+    AutoRoute(page: LoginRoute.page, initial: true),
+    AutoRoute(page: RegisterRoute.page),
     AutoRoute(
+      guards: [AuthGuard(_authController)],
       page: BottomNavBarRoute.page,
       children: [
         AutoRoute(path: 'habits', page: HabitsRoute.page),
@@ -15,24 +23,4 @@ class AppRouter extends RootStackRouter {
       ],
     ),
   ];
-}
-
-@RoutePage()
-class EmptyHabitsPage extends AutoRouter {
-  const EmptyHabitsPage({super.key});
-}
-
-@RoutePage()
-class EmptyStatsPage extends AutoRouter {
-  const EmptyStatsPage({super.key});
-}
-
-@RoutePage()
-class EmptyAddHabitPage extends AutoRouter {
-  const EmptyAddHabitPage({super.key});
-}
-
-@RoutePage()
-class EmptyProfilePage extends AutoRouter {
-  const EmptyProfilePage({super.key});
 }

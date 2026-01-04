@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/core/router/router.gr.dart';
+import 'package:frontend/core/routes/router/router.gr.dart';
 
 @RoutePage()
 class BottomNavBarScreen extends StatelessWidget {
@@ -20,6 +20,10 @@ class BottomNavBarScreen extends StatelessWidget {
         return Scaffold(
           body: child,
           bottomNavigationBar: BottomNavigationBar(
+            backgroundColor: Colors.white,
+            selectedItemColor: Colors.black,
+            unselectedItemColor: Colors.grey,
+            iconSize: 30,
             currentIndex: tabsRouter.activeIndex,
             onTap: (index) => _openPage(index, tabsRouter),
             items: getItems(),
