@@ -8,7 +8,7 @@ import com.habittracker.repository.{RefreshTokenRepository, UserRepository}
 import com.habittracker.security.JwtService
 import com.habittracker.security.PasswordHasher.{hashPassword, verifyPassword}
 
-import java.time.Instant
+import java.time.{Instant, OffsetDateTime, ZoneOffset}
 import java.util.UUID
 
 object UserActor {
@@ -26,6 +26,10 @@ object UserActor {
                              password: String,
                              replyTo: ActorRef[Response]
                            ) extends Command
+  final case class Refresh(
+                          refreshToken: String,
+                          replyTo: ActorRef[Response]
+                          ) extends Command
 
   sealed trait Response
 
@@ -48,6 +52,13 @@ object UserActor {
   final case class AuthFailed(
                              reason: String
                            ) extends Response
+  final case class RefreshSuccess(
+                                   accessToken: String,
+                                   expiresIn: Int
+                                 ) extends Response
+  final case class RefreshFailed(
+                               reason: String
+                             ) extends Response
 
   def apply(): Behavior[Command] =
     Behaviors.receive { (context, message) =>
@@ -81,7 +92,7 @@ object UserActor {
 
               val tokens = Tokens(
                 accessToken = JwtService.createAccessToken(userId, email),
-                refreshToken = refreshToken.token,
+                refreshToken = refreshToken.refreshToken,
                 expiresIn = 900
               )
               replyTo ! AuthSuccess(tokens, userDto)
@@ -107,12 +118,40 @@ object UserActor {
 
                 val tokens = Tokens(
                   accessToken = JwtService.createAccessToken(user.id, email),
-                  refreshToken = refreshToken.token,
+                  refreshToken = refreshToken.refreshToken,
                   expiresIn = 900
                 )
                 replyTo ! AuthSuccess(tokens, userDto)
               }
               Behaviors.same
+            }
+          }
+        }
+        case Refresh(refreshToken, replyTo) => {
+          RefreshTokenRepository.findByHash(refreshToken).unsafeRunSync() match {
+            case None => {
+              replyTo ! RefreshFailed("Invalid refresh token")
+              Behaviors.same
+            }
+            case Some(token) => {
+              val now = OffsetDateTime.now(ZoneOffset.UTC)
+              if (token.expiresAt.isBefore(now)) {
+                replyTo ! RefreshFailed("Refresh token expired")
+                Behaviors.same
+              } else {
+                UserRepository.findById(token.userId).unsafeRunSync() match {
+                  case None => {
+                    replyTo ! RefreshFailed("User not found")
+                    Behaviors.same
+                  }
+                  case Some(user) => {
+                    val accessToken = JwtService.createAccessToken(user.id, user.email)
+                    replyTo ! RefreshSuccess(accessToken, 900)
+                    Behaviors.same
+
+                  }
+                }
+              }
             }
           }
         }

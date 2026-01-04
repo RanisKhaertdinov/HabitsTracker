@@ -17,30 +17,30 @@ object HabitLogRepository {
 
   def create(log: HabitLog): IO[Int] = {
     sql"""
-         INSERT INTO habit_logs (id, habit_id, date, completed)
+         INSERT INTO habitLogs (id, habitId, date, completed)
          VALUES (${log.id},${log.habitId},${log.date},${log.completed})
        """.update.run.transact(xa)
   }
 
   def findByHabitId(habitId: UUID): IO[List[HabitLog]] = {
     sql"""
-         SELECT id, habit_id, date, completed
-         FROM habit_logs
-         WHERE habit_id = $habitId
+         SELECT id, habitId, date, completed
+         FROM habitLogs
+         WHERE habitId = $habitId
        """.query[HabitLog].to[List].transact(xa)
   }
 
   def findByHabitIdAndDate(habitId: UUID, date: LocalDate): IO[Option[HabitLog]] = {
     sql"""
-         SELECT id, habit_id, date, completed
-         FROM habit_logs
-         WHERE habit_id = $habitId AND date = $date
+         SELECT id, habitId, date, completed
+         FROM habitLogs
+         WHERE habitId = $habitId AND date = $date
        """.query[HabitLog].option.transact(xa)
   }
 
   def update(log: HabitLog): IO[Int] = {
     sql"""
-         UPDATE habit_logs
+         UPDATE habitLogs
          SET date = ${log.date}, completed = ${log.completed}
          WHERE id = ${log.id}
        """.update.run.transact(xa)
@@ -49,7 +49,7 @@ object HabitLogRepository {
   def delete(id: UUID): IO[Int] = {
     sql"""
          DELETE
-         FROM habit_logs
+         FROM habitLogs
          WHERE id = $id
        """.update.run.transact(xa)
   }

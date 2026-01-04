@@ -15,22 +15,22 @@ object HabitRepository {
 
   def create(habit: Habit): IO[Int] = {
     sql"""
-         INSERT INTO habits (id, user_id, title, description, schedule_type, active, start_date, created_at)
+         INSERT INTO habits (id, userId, title, description, scheduleType, active, startDate, createdAt)
          VALUES (${habit.id},${habit.userId},${habit.title},${habit.description},${habit.scheduleType},${habit.active},${habit.startDate},${habit.createdAt})
        """.update.run.transact(xa)
   }
 
   def findByUserId(userId: UUID): IO[List[Habit]] = {
     sql"""
-         SELECT id, user_id, title, description, schedule_type, active, start_date, created_at
+         SELECT id, userId, title, description, scheduleType, active, startDate, createdAt
          FROM habits
-         WHERE user_id = $userId
+         WHERE userId = $userId
        """.query[Habit].to[List].transact(xa)
   }
 
   def findById(id: UUID): IO[Option[Habit]] = {
     sql"""
-         SELECT id, user_id, title, description, schedule_type, active, start_date, created_at
+         SELECT id, userId, title, description, scheduleType, active, startDate, createdAt
          FROM habits
          WHERE id = $id
        """.query[Habit].option.transact(xa)
@@ -41,7 +41,7 @@ object HabitRepository {
          UPDATE habits
          SET title = ${habit.title},
              description = ${habit.description},
-             schedule_type = ${habit.scheduleType},
+             scheduleType = ${habit.scheduleType},
              active = ${habit.active}
          WHERE id = ${habit.id}
        """.update.run.transact(xa)

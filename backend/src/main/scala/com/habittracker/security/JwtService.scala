@@ -5,7 +5,7 @@ import io.circe.syntax._
 import io.circe.parser._
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
 
-import java.time.Instant
+import java.time.{Instant, OffsetDateTime, ZoneOffset}
 import java.util.UUID
 
 case class AuthUser (
@@ -14,10 +14,10 @@ case class AuthUser (
                     role: String
                     )
 final case class RefreshToken(
-                               token: String,
+                               refreshToken: String,
                                userId: UUID,
-                               expiresAt: Instant,
-                               createdAt: Instant
+                               expiresAt: OffsetDateTime,
+                               createdAt: OffsetDateTime
                              )
 
 object JwtService {
@@ -51,11 +51,12 @@ object JwtService {
   private val RefreshTokenInSeconds = 60 * 60 * 24 * 10
 
   def createRefreshToken(userId: UUID) = {
+    val now = OffsetDateTime.now(ZoneOffset.UTC)
     RefreshToken(
-      token = UUID.randomUUID().toString,
+      refreshToken = UUID.randomUUID().toString,
       userId = userId,
-      expiresAt = Instant.now().plusSeconds(RefreshTokenInSeconds),
-      createdAt = Instant.now()
+      expiresAt = now.plusSeconds(RefreshTokenInSeconds),
+      createdAt = now
     )
   }
 
