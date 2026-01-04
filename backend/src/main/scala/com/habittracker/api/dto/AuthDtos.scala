@@ -13,10 +13,23 @@ final case class LoginRequest(
                                   email: String,
                                   password: String
                                 )
+
+final case class RefreshRequest(
+                               refreshToken: String
+                               )
+
+final case class LogoutRequest(
+                                refreshToken: String
+                              )
+
 final case class AuthResponse(
                              tokens: Tokens,
                              user: UserDto
                              )
+final case class RefreshResponse(
+                                accessToken: String,
+                                expiresIn: Int
+                                )
 final case class ErrorResponse(
                               error: String
                               )

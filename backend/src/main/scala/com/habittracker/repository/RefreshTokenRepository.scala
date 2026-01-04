@@ -1,62 +1,57 @@
 package com.habittracker.repository
 
 import cats.effect.IO
-import com.habittracker.security.JwtService.RefreshTokenInSeconds
 import com.habittracker.security.RefreshToken
 import com.habittracker.util.DbTransactor
-import doobie.util.transactor.Transactor
-import doobie.postgres.implicits._
 import doobie._
 import doobie.implicits._
+import doobie.postgres.implicits._
 
-import java.time.Instant
+import java.time.OffsetDateTime
 import java.util.UUID
-
-
 
 object RefreshTokenRepository {
   private val xa: Transactor[IO] = DbTransactor.transactor
 
-  def create(refreshToken: RefreshToken) : IO[Int] = {
+  def create(refreshToken: RefreshToken): IO[Int] = {
     sql"""
-         INSERT INTO refresh_tokens
-         (id, user_id, token_hash, expires_at, created_at)
+         INSERT INTO refreshtokens
+         (id, userid, refreshtoken, expiresat, createdat)
          VALUES
-         (${UUID.randomUUID()},${refreshToken.userId},${refreshToken.token}, ${refreshToken.expiresAt}, ${refreshToken.createdAt})
+         (${UUID.randomUUID()}, ${refreshToken.userId}, ${refreshToken.refreshToken}, ${refreshToken.expiresAt}, ${refreshToken.createdAt})
        """.update.run.transact(xa)
   }
 
   def findByHash(tokenHash: String): IO[Option[RefreshToken]] = {
     sql"""
-         SELECT id, user_id, token_hash, expires_at, created_at
-         FROM refresh_tokens
-         WHERE token_hash = $tokenHash
+         SELECT
+           refreshtoken AS "refreshToken",
+           userid AS "userId",
+           expiresat AS "expiresAt",
+           createdat AS "createdAt"
+         FROM refreshtokens
+         WHERE refreshtoken = $tokenHash
        """.query[RefreshToken].option.transact(xa)
   }
 
   def deleteByHash(tokenHash: String): IO[Int] = {
     sql"""
-         DELETE
-         FROM refresh_tokens
-         WHERE token_hash = $tokenHash
+         DELETE FROM refreshtokens
+         WHERE refreshtoken = $tokenHash
        """.update.run.transact(xa)
   }
+
   def deleteAllByUserId(userId: UUID): IO[Int] = {
     sql"""
-         DELETE
-         FROM refresh_tokens
-         WHERE user_id = $userId
+         DELETE FROM refreshtokens
+         WHERE userid = $userId
        """.update.run.transact(xa)
   }
 
-  def deleteExpired(now: Instant): IO[Int] = {
+  def deleteExpired(now: OffsetDateTime): IO[Int] = {
     sql"""
-        DELETE
-        FROM refresh_tokens
-        WHERE expires_at < $now
+        DELETE FROM refreshtokens
+        WHERE expiresat < $now
        """.update.run.transact(xa)
   }
-
-
-
 }
