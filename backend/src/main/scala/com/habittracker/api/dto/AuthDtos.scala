@@ -18,6 +18,9 @@ final case class RefreshRequest(
                                refreshToken: String
                                )
 
+final case class LogoutRequest(
+                                refreshToken: String
+                              )
 
 final case class AuthResponse(
                              tokens: Tokens,

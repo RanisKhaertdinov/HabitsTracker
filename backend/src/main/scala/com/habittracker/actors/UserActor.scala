@@ -31,6 +31,11 @@ object UserActor {
                           replyTo: ActorRef[Response]
                           ) extends Command
 
+  final case class Logout(
+                           refreshToken: String,
+                           replyTo: ActorRef[Response]
+                         ) extends Command
+
   sealed trait Response
 
   final case class Tokens(
@@ -56,9 +61,15 @@ object UserActor {
                                    accessToken: String,
                                    expiresIn: Int
                                  ) extends Response
+
   final case class RefreshFailed(
                                reason: String
                              ) extends Response
+
+  final case class LogoutSuccess() extends Response
+  final case class LogoutFailed(
+                                  reason: String
+                                ) extends Response
 
   def apply(): Behavior[Command] =
     Behaviors.receive { (context, message) =>
@@ -152,6 +163,19 @@ object UserActor {
                   }
                 }
               }
+            }
+          }
+        }
+        case Logout(refreshToken, replyTo) => {
+          RefreshTokenRepository.findByHash(refreshToken).unsafeRunSync() match {
+            case None => {
+              replyTo ! LogoutFailed("Invalid refresh token")
+              Behaviors.same
+            }
+            case Some(token) => {
+              RefreshTokenRepository.deleteByHash(refreshToken).unsafeRunSync()
+              replyTo ! LogoutSuccess()
+              Behaviors.same
             }
           }
         }
