@@ -3,8 +3,10 @@ import 'package:frontend/core/auth/view/auth.dart';
 import 'package:frontend/core/routes/router/router.dart';
 import 'package:frontend/features/auth/auth_controller.dart';
 import 'package:frontend/services/view/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: 'assets/.env');
   runApp(HabitsTracker());
 }
 

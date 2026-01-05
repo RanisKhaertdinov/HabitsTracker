@@ -8,8 +8,8 @@ class UserDataStorage {
   static const String _name = 'name';
   static const String _email = 'email';
 
-  Future<void> saveUser(int id, String name, String email) async {
-    await _storage.write(key: _id, value: id as String);
+  Future<void> saveUser(String id, String name, String email) async {
+    await _storage.write(key: _id, value: id);
     await _storage.write(key: _name, value: name);
     await _storage.write(key: _email, value: email);
   }
@@ -22,8 +22,8 @@ class UserDataStorage {
     );
   }
 
-  Future<int> getUserId() async {
-    return await _storage.read(key: _id) as int;
+  Future<String?> getUserId() async {
+    return await _storage.read(key: _id);
   }
 
   Future<String?> getUserName() async {
