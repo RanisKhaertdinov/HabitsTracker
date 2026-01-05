@@ -46,7 +46,7 @@ class AuthService {
   Future<bool> logout(String refreshToken) async {
     final response = await _dio.post(
       '/auth/logout',
-      data: {"refresh_token": refreshToken},
+      data: {"refreshToken": refreshToken},
     );
     return response.statusCode == 200;
   }
@@ -55,7 +55,7 @@ class AuthService {
     try {
       final response = await _dio.post(
         '/auth/refresh',
-        data: {"refresh_token": refreshToken},
+        data: {"refreshToken": refreshToken},
       );
       return response.data;
     } on DioException catch (e) {
@@ -71,6 +71,4 @@ class AuthService {
       throw handleDioError(e);
     }
   }
-
-
 }

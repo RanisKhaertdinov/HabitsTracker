@@ -1,5 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
+import 'package:frontend/core/routes/router/router.gr.dart';
 import 'package:frontend/models/view/models.dart';
 import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/utils/view/utils.dart';
@@ -83,7 +85,7 @@ class AuthController {
     }
   }
 
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     try {
       _changeState(AuthLoading());
       _authService.logout(await _tokenStorage.getRefreshToken() as String);
@@ -94,32 +96,38 @@ class AuthController {
     } finally {
       await _clearAllData();
       _changeState(AuthUnauthenticated());
+      if (context.mounted) {
+        context.router.replaceAll([LoginRoute()]);
+      }
     }
   }
 
-  Future<void> checkAuthStatus() async {
+  Future<void> checkAuthStatus(BuildContext context) async {
     try {
       _changeState(AuthLoading());
       final refreshToken = await _tokenStorage.getRefreshToken();
       if (refreshToken == null) {
-        await logout();
+        debugPrint("null");
+        await logout(context);
         return;
       }
       final expiresAt = await _tokenStorage.getExpiresAt();
       if (expiresAt == null || DateTime.now().isAfter(expiresAt)) {
         final data = await _authService.refresh(refreshToken);
         await _tokenStorage.saveTokens(
-          data['access_token'],
+          data['accessToken'],
           refreshToken,
-          data['expires_in'],
+          data['expiresIn'],
         );
       }
+      debugPrint("getUser() was called");
       final userData = await _authService.getUser();
       _userDataStorage.saveUser(
         userData['id'],
         userData['name'],
         userData['email'],
       );
+      debugPrint("getUser() success");
       _changeState(
         AuthAuthenticated(
           user: await _userDataStorage.getUserData(),
@@ -134,8 +142,10 @@ class AuthController {
     } on DioException catch (e) {
       final message = handleDioError(e);
       _changeState(AuthError(message: message));
+      debugPrint(message);
     } catch (e) {
-      await logout();
+      debugPrint(e.toString());
+      await logout(context);
     }
   }
 }

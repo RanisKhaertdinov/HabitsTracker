@@ -12,9 +12,9 @@ class Tokens {
   });
 
   factory Tokens.fromJson(Map<String, dynamic> map) {
-    final accessToken = map['access_token'] as String?;
-    final refreshToken = map['refresh_token'] as String?;
-    final expiresIn = map['expires_in'] as int;
+    final accessToken = map['accessToken'] as String?;
+    final refreshToken = map['refreshToken'] as String?;
+    final expiresIn = map['expiresIn'] as int;
 
     DateTime? expiresAt;
     expiresAt = DateTime.now().add(Duration(seconds: expiresIn));

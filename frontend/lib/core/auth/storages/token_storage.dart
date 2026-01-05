@@ -24,7 +24,7 @@ class TokenStorage {
       ),
       _secureStorage.write(
         key: __accessTokenExpiresInKey,
-        value: expiresIn as String,
+        value: expiresIn.toString(),
       ),
     ]);
   }

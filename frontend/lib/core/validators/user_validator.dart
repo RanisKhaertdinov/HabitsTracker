@@ -59,13 +59,13 @@ class UserValidator {
       errors.add('не менее 8 символов');
     }
 
-    if (!RegExp(r'[A-Z]').hasMatch(password)) {
-      errors.add('хотя бы одну заглавную букву');
-    }
+    // if (!RegExp(r'[A-Z]').hasMatch(password)) {
+    //   errors.add('хотя бы одну заглавную букву');
+    // }
 
-    if (!RegExp(r'[a-z]').hasMatch(password)) {
-      errors.add('хотя бы одну строчную букву');
-    }
+    // if (!RegExp(r'[a-z]').hasMatch(password)) {
+    //   errors.add('хотя бы одну строчную букву');
+    // }
 
     if (!RegExp(r'[0-9]').hasMatch(password)) {
       errors.add('хотя бы одну цифру');
