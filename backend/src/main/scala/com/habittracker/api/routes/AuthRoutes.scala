@@ -16,6 +16,8 @@ import scala.concurrent.duration.DurationInt
 import io.circe.generic.auto._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 
+import java.time.{OffsetDateTime, ZoneOffset}
+
 class AuthRoutes (
                    userActor: ActorRef[UserActor.Command]
                  ) (
@@ -66,35 +68,59 @@ class AuthRoutes (
         },
         path("refresh") {
           post {
-            entity(as[RefreshRequest]) { req =>
-              val result = userActor.ask(replyTo =>
-                UserActor.Refresh(req.refreshToken, replyTo)
-              )(timeout, scheduler)
-              onSuccess(result) {
-                case UserActor.RefreshSuccess(accessToken, expiresIn) => {
-                  complete(RefreshResponse(accessToken, expiresIn))
-                }
-                case UserActor.RefreshFailed(reason) => {
-                  complete(401, ErrorResponse(reason))
+            optionalHeaderValueByName("Authorization") {
+              case Some(authHeader) if authHeader.startsWith("Bearer ") => {
+                val token = authHeader.substring("Bearer ".length)
+
+                JwtService.validateToken(token) match {
+                  case Right(authUser) => {
+                    entity(as[RefreshRequest]) { req =>
+                      val result = userActor.ask(replyTo =>
+                        UserActor.Refresh(authUser.userId, req.refreshToken, replyTo)
+                      )(timeout, scheduler)
+                      onSuccess(result) {
+                        case UserActor.RefreshSuccess(accessToken, expiresIn, createdAt) => {
+                          complete(RefreshResponse(accessToken, expiresIn, createdAt))
+                        }
+                        case UserActor.RefreshFailed(reason) => {
+                          complete(401, ErrorResponse(reason))
+                        }
+                      }
+                    }
+                  }
+                  case Left(error) => complete(401, ErrorResponse(s"Invalid access token: $error"))
                 }
               }
+              case _ => complete(401, ErrorResponse("Authorization header must start with Bearer"))
             }
           }
         },
         path("logout") {
           post {
-            entity(as[LogoutRequest]) { req =>
-              val result = userActor.ask(replyTo =>
-                UserActor.Logout(req.refreshToken, replyTo)
-              )(timeout, scheduler)
-              onSuccess(result) {
-                case _ : UserActor.LogoutSuccess => {
-                  complete(200)
-                }
-                case _ : UserActor.LogoutFailed => {
-                  complete(400)
+            optionalHeaderValueByName("Authorization") {
+              case Some(authHeader) if authHeader.startsWith("Bearer ") => {
+                val token = authHeader.substring("Bearer ".length)
+
+                JwtService.validateToken(token) match {
+                  case Right(authUser) => {
+                    entity(as[LogoutRequest]) { req =>
+                      val result = userActor.ask(replyTo =>
+                        UserActor.Logout(authUser.userId, req.refreshToken, replyTo)
+                      )(timeout, scheduler)
+                      onSuccess(result) {
+                        case _ : UserActor.LogoutSuccess => {
+                          complete(200)
+                        }
+                        case _ : UserActor.LogoutFailed => {
+                          complete(400)
+                        }
+                      }
+                    }
+                  }
+                  case Left(error) => complete(401, ErrorResponse(s"Invalid access token: $error"))
                 }
               }
+              case _ => complete(401, ErrorResponse("Authorization header must start with Bearer"))
             }
           }
         },
@@ -111,14 +137,13 @@ class AuthRoutes (
                         val userDto = UserActor.UserDto(user.id, user.email, user.name)
                         complete(200, userDto)
                       }
-                      case None => complete(404)
+                      case None => complete(404, ErrorResponse("User not defined"))
                     }
                   }
-                  case Left(_) => complete(401)
+                  case Left(error) => complete(401, ErrorResponse(s"Invalid access token: $error"))
                 }
               }
-              case _ => complete(401)
-
+              case _ => complete(401, ErrorResponse("Authorization header must start with Bearer"))
             }
           }
         }
