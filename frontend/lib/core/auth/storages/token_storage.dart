@@ -51,8 +51,8 @@ class TokenStorage {
     }
   }
 
-  Future<int> getExpiresIn() async {
-    return await _secureStorage.read(key: __accessTokenExpiresInKey) as int;
+  Future<int?> getExpiresIn() async {
+    return int.tryParse(_secureStorage.read(key: __accessTokenExpiresInKey) as String);
   }
 
   Future<void> deleteTokens() async {

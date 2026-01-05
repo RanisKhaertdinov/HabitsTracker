@@ -59,7 +59,7 @@ class AuthController {
     await _tokenStorage.saveTokens(
       tokens.accessToken,
       tokens.refreshToken,
-      tokens.expiresIn,
+      tokens.expiresIn as int,
     );
     _changeState(AuthAuthenticated(user: response.user, tokens: tokens));
   }
@@ -107,7 +107,6 @@ class AuthController {
       _changeState(AuthLoading());
       final refreshToken = await _tokenStorage.getRefreshToken();
       if (refreshToken == null) {
-        debugPrint("null");
         await logout(context);
         return;
       }
@@ -120,14 +119,12 @@ class AuthController {
           data['expiresIn'],
         );
       }
-      debugPrint("getUser() was called");
       final userData = await _authService.getUser();
       _userDataStorage.saveUser(
         userData['id'],
         userData['name'],
         userData['email'],
       );
-      debugPrint("getUser() success");
       _changeState(
         AuthAuthenticated(
           user: await _userDataStorage.getUserData(),

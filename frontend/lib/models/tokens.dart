@@ -2,7 +2,7 @@ class Tokens {
   final String? accessToken;
   final String? refreshToken;
   final DateTime? expiresAt;
-  final int expiresIn;
+  final int? expiresIn;
 
   Tokens({
     this.accessToken,
