@@ -1,13 +1,13 @@
 class Tokens {
   final String? accessToken;
   final String? refreshToken;
-  final DateTime? expiresAt;
-  final int expiresIn;
+  final String? createdAt;
+  final int? expiresIn;
 
   Tokens({
     this.accessToken,
     this.refreshToken,
-    this.expiresAt,
+    this.createdAt,
     required this.expiresIn,
   });
 
@@ -15,14 +15,12 @@ class Tokens {
     final accessToken = map['accessToken'] as String?;
     final refreshToken = map['refreshToken'] as String?;
     final expiresIn = map['expiresIn'] as int;
-
-    DateTime? expiresAt;
-    expiresAt = DateTime.now().add(Duration(seconds: expiresIn));
+    final createdAt = map['createdAt'] as String?;
 
     return Tokens(
       accessToken: accessToken,
       refreshToken: refreshToken,
-      expiresAt: expiresAt,
+      createdAt: createdAt,
       expiresIn: expiresIn,
     );
   }

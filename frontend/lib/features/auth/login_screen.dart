@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/auth/view/auth.dart';
@@ -7,9 +9,7 @@ import 'package:frontend/core/validators/user_validator.dart';
 
 @RoutePage()
 class LoginScreen extends StatefulWidget {
-  final Function(bool)? onLoginResult;
-
-  const LoginScreen({super.key, this.onLoginResult});
+  const LoginScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _LoginScreenState();
@@ -57,27 +57,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
       await authController.login(email, password);
 
-      widget.onLoginResult?.call(true);
-
-      if (widget.onLoginResult == null) {
-        if (context.mounted) {
-          context.router.replaceAll([const HabitsRoute()]);
-        }
-      }
     } on LoginException catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(e.message)));
       }
-      widget.onLoginResult?.call(false);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Ошибка входа')));
       }
-      widget.onLoginResult?.call(false);
     } finally {
       if (context.mounted) {
         setState(() => _loading = false);
@@ -110,15 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Text("Нет аккаунта?"),
                 TextButton(
                   onPressed: () {
-                    context.router.push(
-                      RegisterRoute(
-                        onRegisterResult: (success) {
-                          if (success) {
-                            widget.onLoginResult?.call(true);
-                          }
-                        },
-                      ),
-                    );
+                    context.router.push(RegisterRoute());
                   },
                   child: Text("Зарегистрироваться"),
                 ),

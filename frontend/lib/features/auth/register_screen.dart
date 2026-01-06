@@ -1,14 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/auth/api/controller_provider.dart';
-import 'package:frontend/core/routes/router/router.gr.dart';
 import 'package:frontend/core/validators/user_validator.dart';
 
 @RoutePage()
 class RegisterScreen extends StatefulWidget {
-  final Function(bool)? onRegisterResult;
-
-  const RegisterScreen({super.key, this.onRegisterResult});
+  const RegisterScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _RegisterScreenState();
@@ -30,7 +27,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _register() async {
-    if (_loading) return;
+    if (_loading || !context.mounted) return;
 
     final name = _nameController.text;
     final email = _emailController.text;
@@ -57,29 +54,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ).showSnackBar(SnackBar(content: Text(passwordResult.errorMessage!)));
       return;
     }
+    if (_loading || !context.mounted) return;
 
     setState(() {
       _loading = true;
     });
-        try {
+    try {
       final authController = AuthControllerProvider.getController(context);
 
       await authController.register(name, email, password);
-
-      widget.onRegisterResult?.call(true);
-
-      if (widget.onRegisterResult == null) {
-        if (context.mounted) {
-          context.router.replaceAll([const HabitsRoute()]);
-        }
-      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
+          // ignore: use_build_context_synchronously
           context,
         ).showSnackBar(SnackBar(content: Text('Ошибка входа: $e')));
       }
-      widget.onRegisterResult?.call(false);
     } finally {
       if (context.mounted) {
         setState(() => _loading = false);
@@ -110,6 +100,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ElevatedButton(
               onPressed: _loading ? null : _register,
               child: Text("Зарегистрироваться"),
+            ),
+            Row(
+              children: [
+                Text("Уже есть аккаунт?"),
+                TextButton(
+                  onPressed: () {
+                    context.router.pop();
+                  },
+                  child: Text("Войти"),
+                ),
+              ],
             ),
           ],
         ),
