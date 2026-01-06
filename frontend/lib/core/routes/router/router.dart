@@ -10,13 +10,14 @@ class AppRouter extends RootStackRouter {
   AppRouter(this._authController);
   @override
   List<AutoRoute> get routes => [
-    AutoRoute(page: LoginRoute.page, initial: true),
+    AutoRoute(page: LoginRoute.page),
     AutoRoute(page: RegisterRoute.page),
     AutoRoute(
+      initial: true,
       guards: [AuthGuard(_authController)],
       page: BottomNavBarRoute.page,
       children: [
-        AutoRoute(path: 'habits', page: HabitsRoute.page),
+        AutoRoute(path: 'habits', page: HabitsRoute.page, initial: true),
         AutoRoute(path: 'stats', page: StatsRoute.page),
         AutoRoute(path: 'add', page: AddHabitRoute.page),
         AutoRoute(path: 'profile', page: ProfileRoute.page),

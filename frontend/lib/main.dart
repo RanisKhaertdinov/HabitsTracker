@@ -42,7 +42,7 @@ class _HabitsTrackerState extends State<HabitsTracker> {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      routerConfig: _appRouter.config(),
+      routerConfig: _appRouter.config(reevaluateListenable: _authController),
       builder: (context, child) {
         return AuthControllerProvider(
           authController: _authController,

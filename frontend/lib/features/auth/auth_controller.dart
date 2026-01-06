@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:auto_route/auto_route.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
@@ -8,22 +10,23 @@ import 'package:frontend/utils/view/utils.dart';
 import 'package:frontend/core/exceptions/view/exceptions.dart';
 import 'package:frontend/core/auth/view/auth.dart';
 
-class AuthController {
+class AuthController extends ChangeNotifier {
   final AuthService _authService;
   final TokenStorage _tokenStorage;
   final UserDataStorage _userDataStorage;
 
   AuthController(this._authService, this._tokenStorage, this._userDataStorage);
 
-  final _state = ValueNotifier<AuthState>(AuthInitial());
-  ValueNotifier<AuthState> get state => _state;
+  AuthState _state = AuthLoading();
+
+  AuthState get state => _state;
+  bool get isAuthenticated => _state is AuthAuthenticated;
 
   void _changeState(AuthState newState) {
-    _state.value = newState;
-  }
-
-  void dispose() {
-    _state.dispose();
+    if (state != newState) {
+      _state = newState;
+      notifyListeners();
+    }
   }
 
   Future<void> _clearAllData() async {
@@ -59,6 +62,7 @@ class AuthController {
     await _tokenStorage.saveTokens(
       tokens.accessToken,
       tokens.refreshToken,
+      tokens.createdAt,
       tokens.expiresIn as int,
     );
     _changeState(AuthAuthenticated(user: response.user, tokens: tokens));
@@ -88,7 +92,8 @@ class AuthController {
   Future<void> logout(BuildContext context) async {
     try {
       _changeState(AuthLoading());
-      _authService.logout(await _tokenStorage.getRefreshToken() as String);
+      final refreshToken = (await _tokenStorage.getRefreshToken()) as String;
+      await _authService.logout(refreshToken);
     } on DioException catch (e) {
       debugPrint('Logout API failed: $e');
     } catch (e) {
@@ -105,34 +110,40 @@ class AuthController {
   Future<void> checkAuthStatus(BuildContext context) async {
     try {
       _changeState(AuthLoading());
+
       final refreshToken = await _tokenStorage.getRefreshToken();
       if (refreshToken == null) {
         await logout(context);
         return;
       }
+
       final expiresAt = await _tokenStorage.getExpiresAt();
       if (expiresAt == null || DateTime.now().isAfter(expiresAt)) {
         final data = await _authService.refresh(refreshToken);
+
         await _tokenStorage.saveTokens(
-          data['accessToken'],
+          data['accessToken'] as String,
           refreshToken,
-          data['expiresIn'],
+          data['createdAt'] as String,
+          data['expiresIn'] as int,
         );
       }
+
       final userData = await _authService.getUser();
       _userDataStorage.saveUser(
-        userData['id'],
-        userData['name'],
-        userData['email'],
+        userData['id'] as String,
+        userData['name'] as String,
+        userData['email'] as String,
       );
+
       _changeState(
         AuthAuthenticated(
           user: await _userDataStorage.getUserData(),
           tokens: Tokens(
             accessToken: await _tokenStorage.getAccessToken(),
             refreshToken: await _tokenStorage.getRefreshToken(),
-            expiresIn: await _tokenStorage.getExpiresIn(),
-            expiresAt: await _tokenStorage.getExpiresAt(),
+            createdAt: await _tokenStorage.getCreatedAt(),
+            expiresIn: (await _tokenStorage.getExpiresIn()) as int,
           ),
         ),
       );

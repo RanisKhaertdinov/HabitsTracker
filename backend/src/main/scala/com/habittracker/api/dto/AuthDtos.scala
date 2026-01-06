@@ -2,6 +2,7 @@ package com.habittracker.api.dto
 
 import com.habittracker.actors.UserActor.{Tokens, UserDto}
 
+import java.time.OffsetDateTime
 import java.util.UUID
 
 final case class RegisterRequest(
@@ -28,7 +29,8 @@ final case class AuthResponse(
                              )
 final case class RefreshResponse(
                                 accessToken: String,
-                                expiresIn: Int
+                                expiresIn: Int,
+                                createdAt: OffsetDateTime
                                 )
 final case class ErrorResponse(
                               error: String

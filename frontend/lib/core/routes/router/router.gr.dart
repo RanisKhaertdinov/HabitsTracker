@@ -10,7 +10,6 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i8;
-import 'package:flutter/material.dart' as _i9;
 import 'package:frontend/core/routes/navigation/bottom_nav_bar.dart' as _i2;
 import 'package:frontend/features/add_habit/add_habit_screen.dart' as _i1;
 import 'package:frontend/features/auth/login_screen.dart' as _i4;
@@ -69,51 +68,18 @@ class HabitsRoute extends _i8.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i4.LoginScreen]
-class LoginRoute extends _i8.PageRouteInfo<LoginRouteArgs> {
-  LoginRoute({
-    _i9.Key? key,
-    dynamic Function(bool)? onLoginResult,
-    List<_i8.PageRouteInfo>? children,
-  }) : super(
-         LoginRoute.name,
-         args: LoginRouteArgs(key: key, onLoginResult: onLoginResult),
-         initialChildren: children,
-       );
+class LoginRoute extends _i8.PageRouteInfo<void> {
+  const LoginRoute({List<_i8.PageRouteInfo>? children})
+    : super(LoginRoute.name, initialChildren: children);
 
   static const String name = 'LoginRoute';
 
   static _i8.PageInfo page = _i8.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<LoginRouteArgs>(
-        orElse: () => const LoginRouteArgs(),
-      );
-      return _i4.LoginScreen(key: args.key, onLoginResult: args.onLoginResult);
+      return const _i4.LoginScreen();
     },
   );
-}
-
-class LoginRouteArgs {
-  const LoginRouteArgs({this.key, this.onLoginResult});
-
-  final _i9.Key? key;
-
-  final dynamic Function(bool)? onLoginResult;
-
-  @override
-  String toString() {
-    return 'LoginRouteArgs{key: $key, onLoginResult: $onLoginResult}';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! LoginRouteArgs) return false;
-    return key == other.key;
-  }
-
-  @override
-  int get hashCode => key.hashCode;
 }
 
 /// generated route for
@@ -134,54 +100,18 @@ class ProfileRoute extends _i8.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i6.RegisterScreen]
-class RegisterRoute extends _i8.PageRouteInfo<RegisterRouteArgs> {
-  RegisterRoute({
-    _i9.Key? key,
-    dynamic Function(bool)? onRegisterResult,
-    List<_i8.PageRouteInfo>? children,
-  }) : super(
-         RegisterRoute.name,
-         args: RegisterRouteArgs(key: key, onRegisterResult: onRegisterResult),
-         initialChildren: children,
-       );
+class RegisterRoute extends _i8.PageRouteInfo<void> {
+  const RegisterRoute({List<_i8.PageRouteInfo>? children})
+    : super(RegisterRoute.name, initialChildren: children);
 
   static const String name = 'RegisterRoute';
 
   static _i8.PageInfo page = _i8.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<RegisterRouteArgs>(
-        orElse: () => const RegisterRouteArgs(),
-      );
-      return _i6.RegisterScreen(
-        key: args.key,
-        onRegisterResult: args.onRegisterResult,
-      );
+      return const _i6.RegisterScreen();
     },
   );
-}
-
-class RegisterRouteArgs {
-  const RegisterRouteArgs({this.key, this.onRegisterResult});
-
-  final _i9.Key? key;
-
-  final dynamic Function(bool)? onRegisterResult;
-
-  @override
-  String toString() {
-    return 'RegisterRouteArgs{key: $key, onRegisterResult: $onRegisterResult}';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! RegisterRouteArgs) return false;
-    return key == other.key;
-  }
-
-  @override
-  int get hashCode => key.hashCode;
 }
 
 /// generated route for
