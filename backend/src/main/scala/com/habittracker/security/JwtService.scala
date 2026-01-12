@@ -41,7 +41,7 @@ object JwtService {
       issuer = Some("habit-tracker"),
       subject = Some(userId.toString),
       audience = Some(Set("habit-tracker-api")),
-      expiration = Some(Instant.now().getEpochSecond + 3600),
+      expiration = Some(Instant.now().getEpochSecond + 360000),
       issuedAt = Some(Instant.now().getEpochSecond)
     )
 
