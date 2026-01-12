@@ -32,6 +32,7 @@ libraryDependencies ++= Seq(
   "org.tpolecat" %% "doobie-core"     % "1.0.0-RC1",
   "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC1",
   "org.tpolecat" %% "doobie-hikari"   % "1.0.0-RC1",
+  "org.tpolecat" %% "doobie-postgres-circe" % "1.0.0-RC1",
   "org.postgresql" % "postgresql"     % "42.6.0",
 
   "com.pauldijou" %% "jwt-core" % JwtVersion,
