@@ -10,8 +10,34 @@ class AddHabitScreen extends StatefulWidget {
 }
 
 class _AddHabitScreenState extends State<AddHabitScreen> {
+  final TextEditingController _titleController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      appBar: AppBar(),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          children: [
+            TextField(
+              decoration: const InputDecoration(labelText: "Название"),
+              controller: _titleController,
+            ),
+            TextField(
+              decoration: const InputDecoration(
+                labelText: "Описание (необязательно)",
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
